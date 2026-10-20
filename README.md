@@ -9,11 +9,11 @@ JavaScript hacia el framework React.
 
 ## Integrantes
 
-| Nombre | Rol en el equipo |
-|---|---|
-| Angela Carrasco 
-| Vicente Grinen
-| Benjamín Sanhueza 
+| Nombre | Usuario GitHub | Rol en el equipo |
+|---|---|---|
+| Angela Carrasco | AngeCO25 | Líder de equipo |
+| Vicente Grinen | vicentegrinen | Desarrollo |
+| Benjamín Sanhueza | benjamin-sz | Desarrollo |
 
 ## Contexto del proyecto
 
