@@ -6,6 +6,7 @@ import Catalogo from "./page/Catalogo";
 import DetalleProducto from "./page/DetalleProducto";
 import Carrito from "./page/Carrito";
 import { agregarAlCarrito, contarItems } from "./datos/carrito";
+import Registro from "./page/Registro";
 
 export default function App() {
   const [total, setTotal] = useState(contarItems());
@@ -24,6 +25,7 @@ export default function App() {
         <Route path="/" element={<Catalogo alAgregar={agregar} />} />
         <Route path="/producto/:codigo" element={<DetalleProducto alAgregar={agregar} />} />
         <Route path="/carrito" element={<Carrito alCambiar={refrescar} />} />
+        <Route path="/registro" element={<Registro />} />
       </Routes>
     </BrowserRouter>
   );
