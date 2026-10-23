@@ -63,7 +63,11 @@ EVA2_002D_ACarrasco_VGrinen_BSanhueza/
 │   │   └── Registro.jsx
 │   ├── datos/                    Fuente de datos y persistencia
 │   │   ├── productos.js
-│   │   └── carrito.js
+│   │   ├── carrito.js
+│   │   ├── regiones.js
+│   │   ├── regiones.test.js
+│   │   ├── validaciones.js
+│   │   └── validaciones.test.js
 │   ├── App.jsx                   Componente principal y rutas
 │   ├── main.jsx                  Punto de entrada
 │   └── setupTests.js             Configuración de las pruebas
@@ -113,3 +117,40 @@ ramas y sentencias.
 | `/producto/:codigo` | Detalle de un producto |
 | `/carrito` | Carrito de compras |
 | `/registro` | Formulario de registro |
+
+## Registro de proveedor
+
+El formulario de registro se construye por partes, un commit por cada una.
+
+### Datos de regiones y comunas
+
+El archivo `src/datos/regiones.js` contiene las 16 regiones de Chile con
+sus comunas. Exporta:
+
+| Elemento | Descripción |
+|---|---|
+| `regiones` | Lista de regiones, cada una con su nombre y sus comunas |
+| `comunasDeRegion(nombre)` | Devuelve las comunas de una región, o una lista vacía si no existe |
+
+El formulario usa estos datos para que la lista de comunas dependa de la
+región elegida. Las pruebas están en `src/datos/regiones.test.js`.
+
+### Validaciones de los campos
+
+El archivo `src/datos/validaciones.js` reúne una función por cada campo del
+formulario. Cada una recibe el valor escrito y devuelve el mensaje de error,
+o un texto vacío (`""`) si el valor es correcto.
+
+| Función | Qué revisa |
+|---|---|
+| `validarRut` | Sin puntos ni guion, entre 7 y 9 caracteres y dígito verificador correcto (acepta K) |
+| `validarNombre` | Entre 2 y 100 caracteres; solo letras, números, espacios y puntos |
+| `validarCorreo` | Un solo arroba, nombre y dominio con formato válido, máximo 100 caracteres |
+| `validarTelefono` | 9 dígitos que empiecen en 9, con o sin prefijo +56 |
+| `validarSeleccion` | Que se haya elegido una opción en categoría, región y comuna |
+| `validarDias` | Número entero entre 1 y 60 |
+| `validarDireccion` | No vacía, máximo 300 caracteres |
+| `validarClaveNueva` | Entre 8 y 10 caracteres con mayúscula, minúscula y número |
+| `validarRepetirClave` | Que coincida con la contraseña original |
+
+Las pruebas están en `src/datos/validaciones.test.js`.
