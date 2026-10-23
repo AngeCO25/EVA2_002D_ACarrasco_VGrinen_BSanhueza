@@ -3,6 +3,7 @@ import { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "./componente/Header";
 import Catalogo from "./page/Catalogo";
+import DetalleProducto from "./page/DetalleProducto";
 import Carrito from "./page/Carrito";
 import { agregarAlCarrito, contarItems } from "./datos/carrito";
 
@@ -21,6 +22,7 @@ export default function App() {
       <Header totalCarrito={total} />
       <Routes>
         <Route path="/" element={<Catalogo alAgregar={agregar} />} />
+        <Route path="/producto/:codigo" element={<DetalleProducto alAgregar={agregar} />} />
         <Route path="/carrito" element={<Carrito alCambiar={refrescar} />} />
       </Routes>
     </BrowserRouter>
