@@ -63,7 +63,9 @@ EVA2_002D_ACarrasco_VGrinen_BSanhueza/
 │   │   └── Registro.jsx
 │   ├── datos/                    Fuente de datos y persistencia
 │   │   ├── productos.js
-│   │   └── carrito.js
+│   │   ├── carrito.js
+│   │   ├── regiones.js
+│   │   └── regiones.test.js
 │   ├── App.jsx                   Componente principal y rutas
 │   ├── main.jsx                  Punto de entrada
 │   └── setupTests.js             Configuración de las pruebas
@@ -113,3 +115,20 @@ ramas y sentencias.
 | `/producto/:codigo` | Detalle de un producto |
 | `/carrito` | Carrito de compras |
 | `/registro` | Formulario de registro |
+
+## Registro de proveedor
+
+El formulario de registro se construye por partes, un commit por cada una.
+
+### Datos de regiones y comunas
+
+El archivo `src/datos/regiones.js` contiene las 16 regiones de Chile con
+sus comunas. Exporta:
+
+| Elemento | Descripción |
+|---|---|
+| `regiones` | Lista de regiones, cada una con su nombre y sus comunas |
+| `comunasDeRegion(nombre)` | Devuelve las comunas de una región, o una lista vacía si no existe |
+
+El formulario usa estos datos para que la lista de comunas dependa de la
+región elegida. Las pruebas están en `src/datos/regiones.test.js`.
