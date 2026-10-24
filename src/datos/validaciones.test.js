@@ -8,7 +8,9 @@ import {
   validarDias,
   validarDireccion,
   validarClaveNueva,
-  validarRepetirClave
+  validarRepetirClave,
+  formatearTelefono,
+  calcularFuerzaClave
 } from "./validaciones";
 
 describe("validarRut", () => {
@@ -118,5 +120,38 @@ describe("validarClaveNueva y validarRepetirClave", () => {
     expect(validarRepetirClave("", "Clave1234")).toMatch(/repita/i);
     expect(validarRepetirClave("Otra1234", "Clave1234")).toMatch(/no coinciden/i);
     expect(validarRepetirClave("Clave1234", "Clave1234")).toBe("");
+  });
+});
+
+describe("formatearTelefono", () => {
+  it("agrega el prefijo +56 si falta", () => {
+    expect(formatearTelefono("")).toBe("+56 ");
+    expect(formatearTelefono("912345678")).toBe("+56 912345678");
+  });
+
+  it("quita letras y simbolos", () => {
+    expect(formatearTelefono("+56 9ab1-2")).toBe("+56 912");
+  });
+
+  it("no repite el 56 y limita a 9 digitos", () => {
+    expect(formatearTelefono("56912345678")).toBe("+56 912345678");
+    expect(formatearTelefono("+56 9123456789999")).toBe("+56 912345678");
+  });
+
+  it("recupera el prefijo si el usuario intenta borrarlo", () => {
+    expect(formatearTelefono("+56")).toBe("+56 ");
+  });
+});
+
+describe("calcularFuerzaClave", () => {
+  it("no muestra nada con la clave vacia", () => {
+    expect(calcularFuerzaClave("").nivel).toBe("");
+  });
+
+  it("clasifica en debil, media y fuerte", () => {
+    expect(calcularFuerzaClave("abc").nivel).toBe("debil");
+    expect(calcularFuerzaClave("Abcdefgh").nivel).toBe("media");
+    expect(calcularFuerzaClave("Clave1234").nivel).toBe("fuerte");
+    expect(calcularFuerzaClave("Clave1234").porcentaje).toBe(100);
   });
 });

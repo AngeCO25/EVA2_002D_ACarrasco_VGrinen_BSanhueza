@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Container, Card, Form, Row, Col, Button } from "react-bootstrap";
+import { Container, Card, Form, Row, Col, Button, Alert, ProgressBar } from "react-bootstrap";
 import { categorias } from "../datos/productos";
 import { regiones, comunasDeRegion } from "../datos/regiones";
 import {
@@ -11,10 +11,13 @@ import {
   validarDias,
   validarDireccion,
   validarClaveNueva,
-  validarRepetirClave
+  validarRepetirClave,
+  formatearTelefono,
+  calcularFuerzaClave,
+  PREFIJO_TELEFONO
 } from "../datos/validaciones";
 
-const PREFIJO_TELEFONO = "+56 ";
+const COLOR_FUERZA = { debil: "danger", media: "warning", fuerte: "success" };
 
 const vacio = {
   rut: "",
@@ -75,10 +78,11 @@ export default function Registro() {
   const errores = calcularErrores(valores);
   const hayErrores = Object.values(errores).some(Boolean);
   const comunas = comunasDeRegion(valores.region);
+  const fuerza = calcularFuerzaClave(valores.clave);
 
   const cambiar = (e) => {
     const { name, value } = e.target;
-    const nuevo = value;
+    const nuevo = name === "telefono" ? formatearTelefono(value) : value;
 
     setValores((previos) => {
       const siguiente = { ...previos, [name]: nuevo };
@@ -180,6 +184,17 @@ export default function Registro() {
               <Campo id="clave" etiqueta="Contrasena" error={errorDe("clave")}
                 pista="Entre 8 y 10 caracteres, con mayuscula, minuscula y numero.">
                 <Form.Control type="password" maxLength={10} autoComplete="new-password" {...control("clave")} />
+                {fuerza.nivel && (
+                  <div className="mt-2">
+                    <ProgressBar
+                      now={fuerza.porcentaje}
+                      variant={COLOR_FUERZA[fuerza.nivel]}
+                      style={{ height: 6 }}
+                      aria-label="Fuerza de la contrasena"
+                    />
+                    <small>{fuerza.texto}</small>
+                  </div>
+                )}
               </Campo>
 
               <Campo id="repetirClave" etiqueta="Repetir contrasena" error={errorDe("repetirClave")}

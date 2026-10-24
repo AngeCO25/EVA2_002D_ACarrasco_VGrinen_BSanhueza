@@ -115,3 +115,35 @@ export function validarRepetirClave(valor, original) {
 
   return "";
 }
+
+export const PREFIJO_TELEFONO = "+56 ";
+
+// Mantiene siempre el prefijo +56 y deja solo numeros (maximo 9 digitos)
+export function formatearTelefono(valor) {
+  let digitos;
+
+  if (valor.startsWith(PREFIJO_TELEFONO)) {
+    digitos = valor.slice(PREFIJO_TELEFONO.length).replace(/[^0-9]/g, "");
+  } else {
+    digitos = valor.replace(/[^0-9]/g, "");
+    if (digitos.startsWith("56")) digitos = digitos.slice(2);
+  }
+
+  return PREFIJO_TELEFONO + digitos.slice(0, 9);
+}
+
+// Cuenta cuantos requisitos cumple la clave: largo, mayuscula, minuscula y numero
+export function calcularFuerzaClave(valor) {
+  if (valor === "") return { nivel: "", texto: "", porcentaje: 0 };
+
+  const puntos = [
+    valor.length >= 8 && valor.length <= 10,
+    /[A-Z]/.test(valor),
+    /[a-z]/.test(valor),
+    /[0-9]/.test(valor)
+  ].filter(Boolean).length;
+
+  if (puntos === 4) return { nivel: "fuerte", texto: "Contrasena fuerte", porcentaje: 100 };
+  if (puntos === 3) return { nivel: "media", texto: "Contrasena media", porcentaje: 66 };
+  return { nivel: "debil", texto: "Contrasena debil", porcentaje: 33 };
+}
