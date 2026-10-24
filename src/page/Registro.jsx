@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Container, Card, Form, Row, Col, Button } from "react-bootstrap";
+import { Container, Card, Form, Row, Col, Button, Alert, ProgressBar } from "react-bootstrap";
 import { categorias } from "../datos/productos";
 import { regiones, comunasDeRegion } from "../datos/regiones";
 import {
@@ -11,10 +11,14 @@ import {
   validarDias,
   validarDireccion,
   validarClaveNueva,
-  validarRepetirClave
+  validarRepetirClave,
+  formatearTelefono,
+  calcularFuerzaClave,
+  PREFIJO_TELEFONO
 } from "../datos/validaciones";
+import { yaExiste, guardarCuenta } from "../datos/cuentas";
 
-const PREFIJO_TELEFONO = "+56 ";
+const COLOR_FUERZA = { debil: "danger", media: "warning", fuerte: "success" };
 
 const vacio = {
   rut: "",
@@ -71,14 +75,17 @@ export default function Registro() {
   const [valores, setValores] = useState(vacio);
   // Un campo solo muestra su error despues de que el usuario lo toca
   const [tocados, setTocados] = useState({});
+  const [duplicado, setDuplicado] = useState("");
+  const [aviso, setAviso] = useState(null);
 
   const errores = calcularErrores(valores);
   const hayErrores = Object.values(errores).some(Boolean);
   const comunas = comunasDeRegion(valores.region);
+  const fuerza = calcularFuerzaClave(valores.clave);
 
   const cambiar = (e) => {
     const { name, value } = e.target;
-    const nuevo = value;
+    const nuevo = name === "telefono" ? formatearTelefono(value) : value;
 
     setValores((previos) => {
       const siguiente = { ...previos, [name]: nuevo };
@@ -87,9 +94,14 @@ export default function Registro() {
       return siguiente;
     });
     setTocados((previos) => ({ ...previos, [name]: true }));
+    if (name === "rut" || name === "correo") setDuplicado("");
   };
 
-  const errorDe = (campo) => (tocados[campo] ? errores[campo] : "");
+  const errorDe = (campo) => {
+    if (!tocados[campo]) return "";
+    if (campo === "rut" && duplicado) return duplicado;
+    return errores[campo];
+  };
 
   // Propiedades comunes de todos los controles del formulario
   const control = (campo) => ({
@@ -102,6 +114,35 @@ export default function Registro() {
 
   const enviar = (e) => {
     e.preventDefault();
+
+    const rut = valores.rut.trim().toUpperCase();
+    const correo = valores.correo.trim().toLowerCase();
+
+    if (yaExiste(rut, correo)) {
+      setDuplicado("Este usuario ya se encuentra registrado.");
+      setAviso({ tipo: "danger", texto: "El RUT o el correo ya existen en el sistema." });
+      return;
+    }
+
+    const nueva = guardarCuenta({
+      rut,
+      correo,
+      nombre: valores.nombre.trim(),
+      telefono: valores.telefono,
+      categoria: valores.categoria,
+      dias: Number(valores.dias),
+      region: valores.region,
+      comuna: valores.comuna,
+      direccion: valores.direccion.trim(),
+      clave: valores.clave
+    });
+
+    setAviso({
+      tipo: "success",
+      texto: `Solicitud de ${nueva.nombre} enviada. Podra ingresar cuando el administrador apruebe su registro.`
+    });
+    setValores(vacio);
+    setTocados({});
   };
 
   return (
@@ -109,6 +150,8 @@ export default function Registro() {
       <Card className="mb-4">
         <Card.Header as="h1" className="h5">Registro de proveedor</Card.Header>
         <Card.Body>
+          {aviso && <Alert variant={aviso.tipo}>{aviso.texto}</Alert>}
+
           <p className="text-muted">
             Este formulario es para empresas que quieren ser proveedoras de
             CompraSegura. La cuenta queda pendiente hasta que el administrador
@@ -180,6 +223,17 @@ export default function Registro() {
               <Campo id="clave" etiqueta="Contrasena" error={errorDe("clave")}
                 pista="Entre 8 y 10 caracteres, con mayuscula, minuscula y numero.">
                 <Form.Control type="password" maxLength={10} autoComplete="new-password" {...control("clave")} />
+                {fuerza.nivel && (
+                  <div className="mt-2">
+                    <ProgressBar
+                      now={fuerza.porcentaje}
+                      variant={COLOR_FUERZA[fuerza.nivel]}
+                      style={{ height: 6 }}
+                      aria-label="Fuerza de la contrasena"
+                    />
+                    <small>{fuerza.texto}</small>
+                  </div>
+                )}
               </Campo>
 
               <Campo id="repetirClave" etiqueta="Repetir contrasena" error={errorDe("repetirClave")}
